@@ -1023,7 +1023,7 @@ var MediaSession = /** @class */ (function () {
     return MediaSession;
 }());
 
-const mediaSession = new MediaSession(
+const mediaInstance = new MediaSession(
     mParticle,
     '1234567',
     'Funny Internet cat video',
@@ -1085,10 +1085,10 @@ const generateSummary = (mediaSession) => {
 };
 
 // we should do this every ten seconds
-generateSummary(mediaSession);
+generateSummary(mediaInstance);
 
 document.addEventListener('visibilitychange', function logData() {
-    if (document.visibilityState === 'hidden' && !mediaSession.sessionSummarySent) { // don't want to double-send the media session summary (check the media session object "sessionSummarySent" flag)
+    if (document.visibilityState === 'hidden' && !mediaInstance.sessionSummarySent) { // don't want to double-send the media session summary (check the media session object "sessionSummarySent" flag)
         const mpInstance = mParticle.getInstance();
         const path = mpInstance._Helpers.createServiceUrl(mpInstance._Store.SDKConfig.v2SecureServiceUrl, mpInstance._Store.devToken) + '/Events';
         navigator.sendBeacon(path, JSON.stringify(window.summaryEventBeacon));
