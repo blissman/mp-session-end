@@ -1034,7 +1034,7 @@ const mediaSession = new MediaSession(
     true
 )
 
-const generateSummary = () => {
+const generateSummary = (mediaSession) => {
     const mpInstance = mParticle.getInstance();
     if (!mediaSession.mediaSessionEndTimestamp) {
         mediaSession.mediaSessionEndTimestamp = Date.now();
@@ -1085,7 +1085,7 @@ const generateSummary = () => {
 };
 
 // we should do this every ten seconds
-generateSummary();
+generateSummary(mediaSession);
 
 document.addEventListener('visibilitychange', function logData() {
     if (document.visibilityState === 'hidden' && !mediaSession.sessionSummarySent) { // don't want to double-send the media session summary (check the media session object "sessionSummarySent" flag)
