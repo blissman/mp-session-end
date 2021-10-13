@@ -1059,11 +1059,12 @@ const generateSnapshot = (mediaSession) => {
     snapshotAttributes["content_id"] = mediaSession.contentId;
     snapshotAttributes["media_session_id"] = mediaSession.sessionId;
 
-    var snapshotOptions = {
-        customAttributes: snapshotAttributes
+    var snapshotEvent = {
+        messageType: 4, // corresponds to private variable Types.MessageType.PageEvent
+        name: "Media Session Snapshot",
+        data: snapshotAttributes,
+        eventType: mParticle.EventType.Media
     };
-
-    var snapshotEvent = // call custom snapshot event
     var snapshotEventObject = mpInstance._ServerModel.createEventObject(snapshotEvent);
     window.snapshotEventBeacon = mpInstance._ServerModel.convertEventToDTO(snapshotEventObject); // we need the event beacons to be accessible by the event listener
 };
