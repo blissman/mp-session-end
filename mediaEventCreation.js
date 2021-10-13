@@ -1068,7 +1068,7 @@ const generateSnapshot = (mediaSession) => {
         eventType: mParticle.EventType.Media
     };
     var snapshotEventObject = mpInstance._ServerModel.createEventObject(snapshotEvent);
-    window.snapshotEventBeacon = mpInstance._ServerModel.convertEventToDTO(snapshotEventObject); // we need the event beacons to be accessible by the event listener
+    window.snapshotEventBeacon = mpInstance._ServerModel.convertEventToDTO(snapshotEventObject); // we need the event beacon to be accessible by the event listener
 };
 
 // 3. update the event beacon objects every ten seconds (you'll need to do this in the player while in the play state)
