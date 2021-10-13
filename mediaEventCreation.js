@@ -1041,23 +1041,23 @@ const generateSnapshot = (mediaSession) => {
     const snapshotTime = Date.now();
 
     var snapshotAttributes = {};
-    snapshotAttributes["media_session_id"] = mediaSession.sessionId;
-    snapshotAttributes["media_session_start_time"] = mediaSession.mediaSessionStartTimestamp;
-    snapshotAttributes["media_session_end_time"] = snapshotTime;
-    snapshotAttributes["content_id"] = mediaSession.contentId;
-    snapshotAttributes["content_title"] = mediaSession.title;
-    snapshotAttributes["media_time_spent"] = snapshotTime - mediaSession.mediaSessionStartTimestamp;
-    snapshotAttributes["media_content_time_spent"] = mediaSession.mediaContentTimeSpent();
-    snapshotAttributes["media_content_complete"] = mediaSession.mediaContentComplete;
-    snapshotAttributes["media_session_segment_total"] = mediaSession.mediaSessionSegmentTotal;
-    snapshotAttributes["media_total_ad_time_spent"] = mediaSession.mediaTotalAdTimeSpent;
-    snapshotAttributes["media_ad_time_spent_rate"] = mediaSession.mediaAdTimeSpentRate();
-    snapshotAttributes["media_session_ad_total"] = mediaSession.mediaSessionAdTotal;
-    snapshotAttributes["media_session_ad_objects"] = mediaSession.mediaSessionAdObjects;
     snapshotAttributes["playhead_position"] = mediaSession.currentPlayheadPosition;
     snapshotAttributes["stream_type"] = mediaSession.streamType;
     snapshotAttributes["content_type"] = mediaSession.contentType;
     snapshotAttributes["content_duration"] = mediaSession.duration;
+    snapshotAttributes["media_session_ad_objects"] = mediaSession.mediaSessionAdObjects;
+    snapshotAttributes["media_session_ad_total"] = mediaSession.mediaSessionAdTotal;
+    snapshotAttributes["media_ad_time_spent_rate"] = mediaSession.mediaAdTimeSpentRate();
+    snapshotAttributes["media_total_ad_time_spent"] = mediaSession.mediaTotalAdTimeSpent;
+    snapshotAttributes["media_session_segment_total"] = mediaSession.mediaSessionSegmentTotal;
+    snapshotAttributes["media_content_complete"] = mediaSession.mediaContentComplete;
+    snapshotAttributes["media_content_time_spent"] = mediaSession.mediaContentTimeSpent();
+    snapshotAttributes["media_time_spent"] = snapshotTime - mediaSession.mediaSessionStartTimestamp;
+    snapshotAttributes["media_session_end_time"] = snapshotTime;
+    snapshotAttributes["media_session_start_time"] = mediaSession.mediaSessionStartTimestamp;
+    snapshotAttributes["content_title"] = mediaSession.title;
+    snapshotAttributes["content_id"] = mediaSession.contentId;
+    snapshotAttributes["media_session_id"] = mediaSession.sessionId;
 
     var snapshotOptions = {
         customAttributes: snapshotAttributes
