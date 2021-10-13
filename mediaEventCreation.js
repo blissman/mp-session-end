@@ -1035,44 +1035,47 @@ const mediaInstance = new MediaSession(
     true
 );
 
-// 2. use the method below to generate the "checkpoint" call
-const generateCheckpoint = (mediaSession) => {
+// 2. use the method below to generate the "snapshot" call
+const generateSnapshot = (mediaSession) => {
     const mpInstance = mParticle.getInstance();
-    const checkpointTime = Date.now();
+    const snapshotTime = Date.now();
 
-    var checkpointAttributes = {};
-    checkpointAttributes["media_session_id"] = mediaSession.sessionId;
-    checkpointAttributes["media_session_start_time"] = mediaSession.mediaSessionStartTimestamp;
-    checkpointAttributes["media_session_end_time"] = checkpointTime;
-    checkpointAttributes["content_id"] = mediaSession.contentId;
-    checkpointAttributes["content_title"] = mediaSession.title;
-    checkpointAttributes["media_time_spent"] = checkpointTime - mediaSession.mediaSessionStartTimestamp;
-    checkpointAttributes["media_content_time_spent"] = mediaSession.mediaContentTimeSpent();
-    checkpointAttributes["media_content_complete"] = mediaSession.mediaContentComplete;
-    checkpointAttributes["media_session_segment_total"] = mediaSession.mediaSessionSegmentTotal;
-    checkpointAttributes["media_total_ad_time_spent"] = mediaSession.mediaTotalAdTimeSpent;
-    checkpointAttributes["media_ad_time_spent_rate"] = mediaSession.mediaAdTimeSpentRate();
-    checkpointAttributes["media_session_ad_total"] = mediaSession.mediaSessionAdTotal;
-    checkpointAttributes["media_session_ad_objects"] = mediaSession.mediaSessionAdObjects;
+    var snapshotAttributes = {};
+    snapshotAttributes["media_session_id"] = mediaSession.sessionId;
+    snapshotAttributes["media_session_start_time"] = mediaSession.mediaSessionStartTimestamp;
+    snapshotAttributes["media_session_end_time"] = snapshotTime;
+    snapshotAttributes["content_id"] = mediaSession.contentId;
+    snapshotAttributes["content_title"] = mediaSession.title;
+    snapshotAttributes["media_time_spent"] = snapshotTime - mediaSession.mediaSessionStartTimestamp;
+    snapshotAttributes["media_content_time_spent"] = mediaSession.mediaContentTimeSpent();
+    snapshotAttributes["media_content_complete"] = mediaSession.mediaContentComplete;
+    snapshotAttributes["media_session_segment_total"] = mediaSession.mediaSessionSegmentTotal;
+    snapshotAttributes["media_total_ad_time_spent"] = mediaSession.mediaTotalAdTimeSpent;
+    snapshotAttributes["media_ad_time_spent_rate"] = mediaSession.mediaAdTimeSpentRate();
+    snapshotAttributes["media_session_ad_total"] = mediaSession.mediaSessionAdTotal;
+    snapshotAttributes["media_session_ad_objects"] = mediaSession.mediaSessionAdObjects;
+    snapshotAttributes["playhead_position"] = mediaSession.currentPlayheadPosition;
+    snapshotAttributes["stream_type"] = mediaSession.streamType;
+    snapshotAttributes["content_type"] = mediaSession.contentType;
+    snapshotAttributes["content_duration"] = mediaSession.duration;
 
-    var checkpointOptions = {
-        currentPlayheadPosition: mediaSession.currentPlayheadPosition,
-        customAttributes: checkpointAttributes
+    var snapshotOptions = {
+        customAttributes: snapshotAttributes
     };
 
-    var checkpointEvent = // call custom checkpoint event
-    var checkpointEventObject = mpInstance._ServerModel.createEventObject(checkpointEvent);
-    window.checkpointEventBeacon = mpInstance._ServerModel.convertEventToDTO(checkpointEventObject); // we need the event beacons to be accessible by the event listener
+    var snapshotEvent = // call custom snapshot event
+    var snapshotEventObject = mpInstance._ServerModel.createEventObject(snapshotEvent);
+    window.snapshotEventBeacon = mpInstance._ServerModel.convertEventToDTO(snapshotEventObject); // we need the event beacons to be accessible by the event listener
 };
 
 // 3. update the event beacon objects every ten seconds (you'll need to do this in the player while in the play state)
-generateCheckpoint(mediaInstance);
+generateSnapshot(mediaInstance);
 
 // 4. set an event listener to track when the user navigates away
 document.addEventListener('visibilitychange', function logData() {
     if (document.visibilityState === 'hidden') {
         const mpInstance = mParticle.getInstance();
         const path = mpInstance._Helpers.createServiceUrl(mpInstance._Store.SDKConfig.v2SecureServiceUrl, mpInstance._Store.devToken) + '/Events';
-        navigator.sendBeacon(path, JSON.stringify(window.checkpointEventBeacon));
+        navigator.sendBeacon(path, JSON.stringify(window.snapshotEventBeacon));
     }
 });
