@@ -1023,6 +1023,7 @@ var MediaSession = /** @class */ (function () {
     return MediaSession;
 }());
 
+// 1. create your media session as normal
 const mediaInstance = new MediaSession(
     mParticle,
     '1234567',
@@ -1032,66 +1033,46 @@ const mediaInstance = new MediaSession(
     'OnDemand',
     true,
     true
-)
+);
 
-const generateSummary = (mediaSession) => {
+// 2. use the method below to generate the "checkpoint" call
+const generateCheckpoint = (mediaSession) => {
     const mpInstance = mParticle.getInstance();
-    if (!mediaSession.mediaSessionEndTimestamp) {
-        mediaSession.mediaSessionEndTimestamp = Date.now();
-    }
+    const checkpointTime = Date.now();
 
-    // media session summary event
-    var summaryAttributes = {};
-    summaryAttributes[ValidMediaAttributeKeys.mediaSessionIdKey] = mediaSession.sessionId;
-    summaryAttributes[ValidMediaAttributeKeys.startTimestampKey] = mediaSession.mediaSessionStartTimestamp;
-    summaryAttributes[ValidMediaAttributeKeys.endTimestampKey] = mediaSession.mediaSessionEndTimestamp;
-    summaryAttributes[ValidMediaAttributeKeys.contentIdKey] = mediaSession.contentId;
-    summaryAttributes[ValidMediaAttributeKeys.contentTitleKey] = mediaSession.title;
-    summaryAttributes[ValidMediaAttributeKeys.mediaTimeSpentKey] = mediaSession.mediaTimeSpent();
-    summaryAttributes[ValidMediaAttributeKeys.contentTimeSpentKey] = mediaSession.mediaContentTimeSpent();
-    summaryAttributes[ValidMediaAttributeKeys.contentCompleteKey] = mediaSession.mediaContentComplete;
-    summaryAttributes[ValidMediaAttributeKeys.totalSegmentsKey] = mediaSession.mediaSessionSegmentTotal;
-    summaryAttributes[ValidMediaAttributeKeys.totalAdTimeSpentKey] = mediaSession.mediaTotalAdTimeSpent;
-    summaryAttributes[ValidMediaAttributeKeys.adTimeSpentRateKey] = mediaSession.mediaAdTimeSpentRate();
-    summaryAttributes[ValidMediaAttributeKeys.totalAdsKey] = mediaSession.mediaSessionAdTotal;
-    summaryAttributes[ValidMediaAttributeKeys.adIDsKey] = mediaSession.mediaSessionAdObjects;
+    var checkpointAttributes = {};
+    checkpointAttributes["media_session_id"] = mediaSession.sessionId;
+    checkpointAttributes["media_session_start_time"] = mediaSession.mediaSessionStartTimestamp;
+    checkpointAttributes["media_session_end_time"] = checkpointTime;
+    checkpointAttributes["content_id"] = mediaSession.contentId;
+    checkpointAttributes["content_title"] = mediaSession.title;
+    checkpointAttributes["media_time_spent"] = checkpointTime - mediaSession.mediaSessionStartTimestamp;
+    checkpointAttributes["media_content_time_spent"] = mediaSession.mediaContentTimeSpent();
+    checkpointAttributes["media_content_complete"] = mediaSession.mediaContentComplete;
+    checkpointAttributes["media_session_segment_total"] = mediaSession.mediaSessionSegmentTotal;
+    checkpointAttributes["media_total_ad_time_spent"] = mediaSession.mediaTotalAdTimeSpent;
+    checkpointAttributes["media_ad_time_spent_rate"] = mediaSession.mediaAdTimeSpentRate();
+    checkpointAttributes["media_session_ad_total"] = mediaSession.mediaSessionAdTotal;
+    checkpointAttributes["media_session_ad_objects"] = mediaSession.mediaSessionAdObjects;
 
-    var summaryOptions = {
+    var checkpointOptions = {
         currentPlayheadPosition: mediaSession.currentPlayheadPosition,
-        customAttributes: summaryAttributes
+        customAttributes: checkpointAttributes
     };
 
-    var summaryEvent = mediaSession.createMediaEvent(MediaEventType.SessionSummary, summaryOptions);
-    var summaryEventPage = summaryEvent.toPageEvent();
-    var summaryEventObject = mpInstance._ServerModel.createEventObject(summaryEventPage);
-    window.summaryEventBeacon = mpInstance._ServerModel.convertEventToDTO(summaryEventObject);
-
-    // media session end event
-    var endAttributes = {};
-    endAttributes[ValidMediaAttributeKeys.mediaSessionIdKey] = mediaSession.sessionId;
-    endAttributes[ValidMediaAttributeKeys.contentIdKey] = mediaSession.contentId;
-    endAttributes[ValidMediaAttributeKeys.contentTitleKey] = mediaSession.title;
-    endAttributes["playhead_position"] = mediaSession.currentPlayheadPosition;
-
-    var endOptions = {
-        currentPlayheadPosition: mediaSession.currentPlayheadPosition,
-        customAttributes: endAttributes
-    };
-
-    var endEvent = mediaSession.createMediaEvent(MediaEventType.SessionEnd, endOptions);
-    var endEventPage = endEvent.toPageEvent();
-    var endEventObject = mpInstance._ServerModel.createEventObject(endEventPage);
-    window.endEventBeacon = mpInstance._ServerModel.convertEventToDTO(endEventObject);
+    var checkpointEvent = // call custom checkpoint event
+    var checkpointEventObject = mpInstance._ServerModel.createEventObject(checkpointEvent);
+    window.checkpointEventBeacon = mpInstance._ServerModel.convertEventToDTO(checkpointEventObject); // we need the event beacons to be accessible by the event listener
 };
 
-// we should do this every ten seconds
-generateSummary(mediaInstance);
+// 3. update the event beacon objects every ten seconds (you'll need to do this in the player while in the play state)
+generateCheckpoint(mediaInstance);
 
+// 4. set an event listener to track when the user navigates away
 document.addEventListener('visibilitychange', function logData() {
-    if (document.visibilityState === 'hidden' && !mediaInstance.sessionSummarySent) { // don't want to double-send the media session summary (check the media session object "sessionSummarySent" flag)
+    if (document.visibilityState === 'hidden') {
         const mpInstance = mParticle.getInstance();
         const path = mpInstance._Helpers.createServiceUrl(mpInstance._Store.SDKConfig.v2SecureServiceUrl, mpInstance._Store.devToken) + '/Events';
-        navigator.sendBeacon(path, JSON.stringify(window.summaryEventBeacon));
-        navigator.sendBeacon(path, JSON.stringify(window.endEventBeacon));
+        navigator.sendBeacon(path, JSON.stringify(window.checkpointEventBeacon));
     }
 });
