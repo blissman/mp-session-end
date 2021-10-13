@@ -1040,6 +1040,7 @@ const generateSnapshot = (mediaSession) => {
     const mpInstance = mParticle.getInstance();
     const snapshotTime = Date.now();
 
+    // populate snapshot attributes
     var snapshotAttributes = {};
     snapshotAttributes["playhead_position"] = mediaSession.currentPlayheadPosition;
     snapshotAttributes["stream_type"] = mediaSession.streamType;
@@ -1059,6 +1060,7 @@ const generateSnapshot = (mediaSession) => {
     snapshotAttributes["content_id"] = mediaSession.contentId;
     snapshotAttributes["media_session_id"] = mediaSession.sessionId;
 
+    // generate your event and save it to an object
     var snapshotEvent = {
         messageType: 4, // corresponds to private variable Types.MessageType.PageEvent
         name: "Media Session Snapshot",
